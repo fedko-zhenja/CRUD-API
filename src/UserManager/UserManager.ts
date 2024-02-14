@@ -69,7 +69,7 @@ export class UserManager {
             const index = findIndexByID(user, this.users);
             deleteUser(index, this.users);
 
-            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(204, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ message: 'user deleted', currentUsers: this.users }));
         } else if (user === undefined) {
             res.writeHead(404, { 'Content-Type': 'application/json' });
