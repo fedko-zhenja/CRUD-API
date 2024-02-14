@@ -4,6 +4,7 @@ import { findUserByID } from '../helpers/findUserByID.ts';
 import { findIndexByID } from '../helpers/findIndexByID.ts';
 import { deleteUser } from '../helpers/deleteUser.ts';
 import { updateUserData } from '../helpers/updateUserData.ts';
+import { hasRequiredFields } from '../helpers/hasRequiredFields.ts';
 
 export class UserManager {
     private readonly users: User[] = [];
@@ -25,8 +26,35 @@ export class UserManager {
         ];
     }
 
-    createUser = (): void => {
+    createUser = (req: http.IncomingMessage, res: http.ServerResponse): void => {
         console.log('createUser');
+
+        let bodyReq = '';
+
+        req.on('data', (data) => {
+            bodyReq += data;
+        });
+
+        req.on('end', () => {
+            try {
+                const user = findUserByID(req, this.users);
+
+                const dataPars: NewData = JSON.parse(bodyReq);
+                const hasReqFields = hasRequiredFields(dataPars);
+
+                if (!user && hasReqFields) {
+                    this.users.push(dataPars as User);
+                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'user data updated', currentUsers: this.users }));
+                } else if (!hasReqFields) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'does not contain required fields' }));
+                }
+            } catch {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Server error' }));
+            }
+        });
     };
 
     getAllUsers = (req: http.IncomingMessage, res: http.ServerResponse): void => {
