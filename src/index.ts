@@ -18,6 +18,8 @@ const server = http.createServer((req, res) => {
         userManager.getUser(req, res);
     } else if (req.url?.startsWith('/api/users/') && req.method === 'DELETE') {
         userManager.deleteUser(req, res);
+    } else if (req.url?.startsWith('/api/users/') && req.method === 'PUT') {
+        userManager.updateUser(req, res);
     } else {
         console.log(req.url);
         res.writeHead(404, { 'Content-Type': 'application/json' });

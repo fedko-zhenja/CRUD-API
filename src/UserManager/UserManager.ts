@@ -1,8 +1,9 @@
-import { type User } from './type';
+import { type User, type NewData } from './type';
 import type http from 'node:http';
 import { findUserByID } from '../helpers/findUserByID.ts';
 import { findIndexByID } from '../helpers/findIndexByID.ts';
 import { deleteUser } from '../helpers/deleteUser.ts';
+import { updateUserData } from '../helpers/updateUserData.ts';
 
 export class UserManager {
     private readonly users: User[] = [];
@@ -58,8 +59,38 @@ export class UserManager {
         }
     };
 
-    updateUser = (): void => {
-        console.log('updateUser');
+    updateUser = (req: http.IncomingMessage, res: http.ServerResponse): void => {
+        let bodyReq = '';
+
+        req.on('data', (data) => {
+            bodyReq += data;
+        });
+
+        req.on('end', () => {
+            try {
+                const user = findUserByID(req, this.users);
+
+                if (user) {
+                    const index = findIndexByID(user, this.users);
+
+                    const dataPars: NewData = JSON.parse(bodyReq);
+
+                    updateUserData(index, dataPars, this.users);
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'user data updated', currentUsers: this.users }));
+                } else if (user === undefined) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end();
+                } else if (user === null) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'userId is invalid' }));
+                }
+            } catch {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Server error' }));
+            }
+        });
     };
 
     deleteUser = (req: http.IncomingMessage, res: http.ServerResponse): void => {
