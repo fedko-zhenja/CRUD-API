@@ -63,20 +63,25 @@ export class UserManager {
     };
 
     deleteUser = (req: http.IncomingMessage, res: http.ServerResponse): void => {
-        const user = findUserByID(req, this.users);
+        try {
+            const user = findUserByID(req, this.users);
 
-        if (user) {
-            const index = findIndexByID(user, this.users);
-            deleteUser(index, this.users);
+            if (user) {
+                const index = findIndexByID(user, this.users);
+                deleteUser(index, this.users);
 
-            res.writeHead(204, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ message: 'user deleted', currentUsers: this.users }));
-        } else if (user === undefined) {
-            res.writeHead(404, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'The user was not found by the entered id.' }));
-        } else if (user === null) {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'userId is invalid' }));
+                res.writeHead(204, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'user deleted', currentUsers: this.users }));
+            } else if (user === undefined) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end();
+            } else if (user === null) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'userId is invalid' }));
+            }
+        } catch {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Server error' }));
         }
     };
 }
