@@ -1,5 +1,6 @@
 import { type User } from './type';
 import type http from 'node:http';
+import { isValidId } from './isValidId';
 
 export class UserManager {
     private readonly users: User[] = [];
@@ -7,13 +8,13 @@ export class UserManager {
     constructor() {
         this.users = [
             {
-                id: '1',
+                id: '0',
                 username: 'zhenja',
                 age: 26,
                 hobbies: ['learning'],
             },
             {
-                id: '2',
+                id: '1',
                 username: 'vadim',
                 age: 27,
                 hobbies: ['programming'],
@@ -36,11 +37,10 @@ export class UserManager {
     };
 
     getUser = (req: http.IncomingMessage, res: http.ServerResponse): void => {
-        const regex = /\/(\d+)$/;
-        const userNum = req.url?.match(regex);
         try {
-            if (userNum) {
-                const index = Number(userNum[1]);
+            const index = isValidId(req);
+
+            if (index === 0 || index) {
                 if (index >= 0 && index < this.users.length) {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify(this.users[index]));
@@ -48,6 +48,9 @@ export class UserManager {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: 'The user was not found by the entered index.' }));
                 }
+            } else {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'userId is invalid' }));
             }
         } catch {
             res.writeHead(500, { 'Content-Type': 'application/json' });
