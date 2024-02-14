@@ -1,6 +1,6 @@
 import { type User } from './type';
 import type http from 'node:http';
-import { isValidId } from './isValidId';
+import { findUserByID } from '../helpers/findUserByID.ts';
 
 export class UserManager {
     private readonly users: User[] = [];
@@ -8,13 +8,13 @@ export class UserManager {
     constructor() {
         this.users = [
             {
-                id: '0',
+                id: '1',
                 username: 'zhenja',
                 age: 26,
                 hobbies: ['learning'],
             },
             {
-                id: '1',
+                id: '2',
                 username: 'vadim',
                 age: 27,
                 hobbies: ['programming'],
@@ -38,17 +38,15 @@ export class UserManager {
 
     getUser = (req: http.IncomingMessage, res: http.ServerResponse): void => {
         try {
-            const index = isValidId(req);
-
-            if (index === 0 || index) {
-                if (index >= 0 && index < this.users.length) {
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify(this.users[index]));
-                } else {
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'The user was not found by the entered index.' }));
-                }
-            } else {
+            const user = findUserByID(req, this.users);
+            console.log(user);
+            if (user && user !== 'invalid id') {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(user));
+            } else if (user === undefined) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'The user was not found by the entered id.' }));
+            } else if (user === 'invalid id') {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'userId is invalid' }));
             }
