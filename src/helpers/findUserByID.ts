@@ -2,7 +2,7 @@
 import type http from 'node:http';
 import type { User } from 'UserManager/type';
 
-export function findUserByID(req: http.IncomingMessage, usersArray: User[]): User | undefined | string {
+export function findUserByID(req: http.IncomingMessage, usersArray: User[]): User | undefined | null {
     const userId = req.url?.match(/\/([^\/]+)\/?$/);
 
     if (userId?.[1]) {
@@ -10,6 +10,6 @@ export function findUserByID(req: http.IncomingMessage, usersArray: User[]): Use
 
         return res;
     } else {
-        return 'invalid id';
+        return null;
     }
 }
