@@ -7,7 +7,5 @@ export function findUserByID(req: http.IncomingMessage, usersArray: User[]): Use
     if (userId?.[1]) {
         const res = usersArray.find((user) => user.id === userId?.[1]);
         return res;
-    } else {
-        return null;
     }
 }

@@ -23,9 +23,8 @@ const server = http.createServer((req, res) => {
     } else if (req.url?.startsWith('/api/users') && req.url.endsWith('/api/users') && req.method === 'POST') {
         userManager.createUser(req, res);
     } else {
-        console.log(req.url);
         res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'ROUTE not found', err: req.url }));
+        res.end(JSON.stringify({ message: 'ROUTE not found', wrongRoute: req.url }));
     }
 });
 
