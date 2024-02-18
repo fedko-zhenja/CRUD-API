@@ -8,7 +8,7 @@ import { hasRequiredFields } from '../helpers/hasRequiredFields.ts';
 import { isValidId } from '../helpers/isValidId.ts';
 
 export class UserManager {
-    private readonly users: User[] = [];
+    readonly users: User[] = [];
 
     constructor() {
         this.users = [
