@@ -44,10 +44,10 @@ export class UserManager {
                 if (!user && hasReqFields) {
                     this.users.push(dataPars as User);
                     res.writeHead(201, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ message: 'user data updated', currentUsers: this.users }));
+                    res.end(JSON.stringify({ message: 'new user created', newUser: dataPars as User }));
                 } else if (!hasReqFields) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'does not contain required fields' }));
+                    res.end(JSON.stringify({ error: 'must contain only required fields: [username, age, hobbies]' }));
                 }
             } catch {
                 res.writeHead(500, { 'Content-Type': 'application/json' });
